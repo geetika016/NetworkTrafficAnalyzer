@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Network Analytics Dashboard</title>
+    <link href="static/c3/c3.css" rel="stylesheet" />
+    <script src="static/c3/c3.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+      body {
+        font-family: "Lato", sans-serif;
+      }
+
+      .sidenav {
+        height: 100%;
+        width: 160px;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        padding-top: 20px;
+      }
+
+      .sidenav a {
+        padding: 16px 8px 6px 18px;
+        text-decoration: none;
+        font-size: 15px;
+        color: #f1f1f1;
+        display: block;
+      }
+
+      .sidenav a:hover {
+        color: #f1f1f1;
+      }
+
+      .main {
+        margin-left: 160px; /* Same as the width of the sidenav */
+        font-size: 15px; /* Increased text to enable scrolling */
+        padding: 20px 40px;
+      }
+
+      .item {
+        display: inline-block;
+      }
+
+      @media screen and (max-height: 450px) {
+        .sidenav {
+          padding-top: 15px;
+        }
+        .sidenav a {
+          font-size: 18px;
+        }
+      }
+      /* div {
+  position: relative;
+  overflow: hidden;
+} */
+
+      .btny {
+        background-color: #3180f3;
+        font-family: Verdana, Geneva, sans-serif;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 11px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+
+      input {
+        position: absolute;
+        font-size: 50px;
+        opacity: 0;
+        right: 0;
+        top: 0;
+      }
+
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        /* filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  opacity: 0.5;     */
+      }
+
+      #overlay span {
+        padding: 5px;
+        border-radius: 5px;
+        color: #000;
+        background-color: #fff;
+        position: relative;
+        top: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidenav">
+      <div style="width: 80%;margin: 0 auto;">
+        <form
+          id="frm"
+          action="/file"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <div class="btny">
+            UPLOAD PCAP
+            <input class="" type="file" name="file" id="file" />
+          </div>
+        </form>
+      </div>
+      <a href="#" style="color: #3180f3">Dashboard</a>
+      <a href="/visualize">Visualize</a>
+      <a href="/anomalies">Anomalous Connections</a>
+      <a href="/hierarchical">Hierarchical</a>
+    </div>
+
+    <div class="main">
+      <div>
+        <div id="chart1" class="item"></div>
+        <div id="chart2" class="item"></div>
+      </div>
+      <br /><br /><br /><br />
+      <div>
+        <div id="chart7" class="item"></div>
+        <div id="chart3" class="item"></div>
+        <div id="chart4" class="item"></div>
+        <div id="chart5" class="item"></div>
+        <div id="chart6" class="item"></div>
+      </div>
+    </div>
+    <div id="overlay">
+      <span><img src="static/loading.gif" height="80" width="80"/></span>
+    </div>
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script>
+                          var chart1 = c3.generate({
+                      data: {
+                          x : 'x',
+                          columns: [
+
+                          ],
+                          type: 'bar'
+                      },
+                      axis: {
+                          x: {
+                              type: 'category',
+                              tick: {
+                                  rotate: -90,
+                                  multiline: false
+                              },
+                              height: 150,
+                          }
+                      },
+                        legend: {
+                          show: false
+                      },
+                        size: {
+                      width: 500
+                      },
+                      bar: {
+                          // or
+                          width: 30, // this makes bar width 100px,
+                      },
+                      title: {
+              text: 'Top Connections (Total No. of Packets)'
+            },
+                      bindto: '#chart1',
+                  });
+
+            var chart2 = c3.generate({
+                      data: {
+                          x : 'x',
+                          columns: [
+
+                          ],
+                          type: 'bar'
+                      },
+                      axis: {
+                          x: {
+                              type: 'category',
+                              tick: {
+                                  rotate: -90,
+                                  multiline: false
+                              },
+                              height: 150,
+                          }
+                      },
+                        legend: {
+                          show: false
+                      },
+                        size: {
+                      width: 500
+                      },
+                      bar: {
+                          // or
+                          width: 30, // this makes bar width 100px,
+                      },
+                      title: {
+              text: 'Top Connections (Total Data Transferred)'
+            },
+                      bindto: '#chart2'
+                  });
+
+                  var chart3 = c3.generate({
+                      size: {
+                          height: 200,
+                          width: 200,
+                      },
+                  data: {
+                    x: 'Letter',
+                    columns:
+                    [
+                      ['Letter', {{sports_x_packets | safe}}],
+                      ['value', {{sports_no_packets | safe}}]
+                    ],
+
+                    type: 'bar',
+
+                        colors: {
+                        value: '#87CEFA'
+                    },
+
+                  },
+                  axis: {
+                    x: {
+                      type: 'category',
+                    },
+                    y: {
+                      tick: {
+                      rotate: -90,
+                      multiline: false
+                  },
+                    },
+                    rotated: true
+                  },
+                  legend: {
+                    show: false
+                  },
+                  bindto: '#chart3',
+                  title: {
+              text: 'SPort (Packets)'
+            },
+                  });
+                  var chart4 = c3.generate({
+                      size: {
+                          height: 200,
+                          width: 200,
+                      },
+                  data: {
+                    x: 'Letter',
+                    columns:
+                    [
+                      ['Letter', {{dports_x_packets | safe}}],
+                      ['value', {{dports_no_packets | safe}}]
+                    ],
+
+                    type: 'bar',
+
+                        colors: {
+                        value: '#87CEFA'
+                    },
+
+                  },
+                  axis: {
+                    x: {
+                      type: 'category',
+                    },
+                    y: {
+                      tick: {
+                      rotate: -90,
+                      multiline: false
+                  },
+                    },
+                    rotated: true
+                  },
+                  legend: {
+                    show: false
+                  },
+                  bindto: '#chart4',
+                  title: {
+              text: 'DPort (Packets)'
+            },
+                  });
+                  var chart5 = c3.generate({
+                      size: {
+                          height: 200,
+                          width: 200,
+                      },
+                  data: {
+                    x: 'Letter',
+                    columns:
+                    [
+                      ['Letter', {{sports_x_data | safe}}],
+                      ['value', {{sports_no_data | safe}}]
+                    ],
+
+                    type: 'bar',
+
+                        colors: {
+                        value: '#87CEFA'
+                    },
+
+                  },
+                  axis: {
+                    x: {
+                      type: 'category',
+                    },
+                    y: {
+                      tick: {
+                      rotate: -90,
+                      multiline: false
+                  },
+                    },
+                    rotated: true
+                  },
+                  legend: {
+                    show: false
+                  },
+                  bindto: '#chart5',
+                  title: {
+              text: 'SPort (Bytes)'
+            },
+                  });
+                  var chart6 = c3.generate({
+                      size: {
+                          height: 200,
+                          width: 200,
+                      },
+                  data: {
+                    x: 'Letter',
+                    columns:
+                    [
+                      ['Letter', {{dports_x_data | safe}}],
+                      ['value', {{dports_no_data | safe}}]
+                    ],
+
+                    type: 'bar',
+
+                        colors: {
+                        value: '#87CEFA'
+                    },
+
+                  },
+                  axis: {
+                    x: {
+                      type: 'category',
+                    },
+                    y: {
+                      tick: {
+                      rotate: -90,
+                      multiline: false
+                  },
+                    },
+                    rotated: true
+                  },
+                  legend: {
+                    show: false
+                  },
+                  bindto: '#chart6',
+                  title: {
+              text: 'DPort (Bytes)'
+            },
+                  });
+
+                  chart7 = c3.generate({
+          data: {
+             columns: [
+                  {{ protocols | safe}}
+              ],
+              type: 'donut',
+          },
+          donut: { width: 42 },
+          size: {
+            width:230,
+            height:230
+          },
+          bindto: '#chart7',
+          oninit: function () {
+              this.meetsArcLabelThreshold = function () { return true; };
+          },
+          label:{
+                  format:function(x){
+         return x;
+           }
+        },
+        tooltip:{
+           format:{
+            value:function(x){
+            return x;
+             }
+         },
+        },
+        title: {
+              text: 'Protocols'
+            },
+      });
+
+                  setTimeout(function () {
+                      chart1.load({
+                          columns: [
+                          ['x', {{connections_x_packets | safe}}],
+                          ['Packets', {{connections_no_packets | safe}}]
+                          ]
+                      });
+                  }, 200);
+
+                  setTimeout(function () {
+                      chart2.load({
+                          columns: [
+                          ['x', {{connections_x_data | safe}}],
+                          ['Bytes', {{connections_no_data | safe}}]
+                          ]
+                      });
+                  }, 200);
+
+                    $(document).ready(function(){
+                       $("#overlay").hide();
+                       $('#file').change(function(){
+                            $(".main").hide();
+                            $("#overlay").show();
+                             $('#frm').submit();
+                       });
+                    });
+    </script>
+  </body>
+</html>

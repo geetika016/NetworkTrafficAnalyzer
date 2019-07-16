@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Network Analytics Dashboard</title>
+    <style>
+      body {
+        font-family: "Lato", sans-serif;
+      }
+
+      .sidenav {
+        height: 100%;
+        width: 160px;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        padding-top: 20px;
+      }
+
+      .sidenav a {
+        padding: 16px 8px 6px 18px;
+        text-decoration: none;
+        font-size: 15px;
+        color: #3180f3;
+        display: block;
+      }
+
+      .sidenav a:hover {
+        color: #f1f1f1;
+      }
+
+      .main {
+        margin-left: 160px; /* Same as the width of the sidenav */
+        font-size: 15px; /* Increased text to enable scrolling */
+        padding: 0px 10px;
+      }
+
+      @media screen and (max-height: 450px) {
+        .sidenav {
+          padding-top: 15px;
+        }
+        .sidenav a {
+          font-size: 18px;
+        }
+      }
+      /* div {
+  position: relative;
+  overflow: hidden;
+} */
+
+      .btny {
+        background-color: #3180f3;
+        font-family: Verdana, Geneva, sans-serif;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 11px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+
+      input {
+        position: absolute;
+        font-size: 50px;
+        opacity: 0;
+        right: 0;
+        top: 0;
+      }
+
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        /* filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  opacity: 0.5;     */
+      }
+
+      #overlay span {
+        padding: 5px;
+        border-radius: 5px;
+        color: #000;
+        background-color: #fff;
+        position: relative;
+        top: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidenav">
+      <div style="width: 80%;margin: 0 auto;">
+        <form
+          id="frm"
+          action="/file"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <div class="btny">
+            UPLOAD PCAP
+            <input class="" type="file" name="file" id="file" />
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="main"></div>
+    <div id="overlay">
+      <span><img src="static/loading.gif" height="80" width="80"/></span>
+    </div>
+
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#overlay").hide();
+        $("#file").change(function() {
+          $(".main").hide();
+          $("#overlay").show();
+          $("#frm").submit();
+        });
+      });
+    </script>
+  </body>
+</html>
